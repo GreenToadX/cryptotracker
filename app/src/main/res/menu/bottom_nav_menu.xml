@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/tab1"
+        android:icon="@drawable/bitcoin_btc_logo"
+        android:title=""
+        android:iconTint="@null" />
+
+
+    <item
+        android:id="@+id/tab2"
+        android:icon="@drawable/ethereum_eth_logo"
+        android:title="" />
+
+    <item
+        android:id="@+id/tab3"
+        android:icon="@drawable/solana_sol_logo"
+        android:title="" />
+
+    <item
+        android:id="@+id/tab4"
+        android:icon="@drawable/chainlink_link_logo"
+        android:title="" />
+</menu>
+

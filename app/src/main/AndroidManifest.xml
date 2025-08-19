@@ -14,19 +14,27 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Cryptotracker">
+        android:theme="@style/Theme.CryptoTracker">
 
+        <!-- New launcher activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".LandingActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Cryptotracker">
+            android:theme="@style/Theme.CryptoTracker">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Your existing crypto dashboard -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.CryptoTracker" />
 
     </application>
 

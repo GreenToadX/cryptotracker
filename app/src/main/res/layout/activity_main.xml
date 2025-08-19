@@ -1,17 +1,200 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp">
+    android:background="#121212">
 
-    <TextView
-        android:id="@+id/priceTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Loading..."
-        android:textSize="18sp"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp" />
-</LinearLayout>
+    <!-- Main content layout -->
+    <LinearLayout
+        android:id="@+id/mainContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginBottom="64dp"
+        android:background="#121212">
+
+        <!-- Header image -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/headerImage"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:scaleType="fitCenter"
+                android:background="#00FFFFFF"
+                android:src="@drawable/mycryptos"
+                android:contentDescription="My Cryptos header" />
+        </LinearLayout>
+
+        <!-- Main content: coin list on left, info on right -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:padding="24dp">
+
+            <!-- Coin Buttons (Vertical, Left-Aligned) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="start"
+                android:layout_marginEnd="24dp">
+
+                <!-- Bitcoin -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageButton
+                        android:id="@+id/bitcoinButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@android:color/transparent"
+                        android:padding="8dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/bitcoin_btc_logo" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BTC"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Ethereum -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageButton
+                        android:id="@+id/ethereumButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@android:color/transparent"
+                        android:padding="8dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ethereum_eth_logo" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ETH"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Solana -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageButton
+                        android:id="@+id/solanaButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@android:color/transparent"
+                        android:padding="8dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/solana_sol_logo" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SOL"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Chainlink -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <ImageButton
+                        android:id="@+id/chainlinkButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@android:color/transparent"
+                        android:padding="8dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/chainlink_link_logo" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LINK"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Info Panel (Right-Aligned) -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <!-- Price Display -->
+                <TextView
+                    android:id="@+id/priceTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Select a coin"
+                    android:textSize="20sp"
+                    android:textColor="#FFFFFF"
+                    android:gravity="center"
+                    android:padding="16dp" />
+
+                <!-- Wallet Balance Display -->
+                <TextView
+                    android:id="@+id/balanceTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Wallet Balance: --"
+                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:gravity="center"
+                    android:padding="8dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Bottom tab bar -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom"
+        android:background="#1E1E1E"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="unlabeled"
+        app:itemIconSize="32dp"
+        app:itemIconTint="@null" />
+</FrameLayout>
+
