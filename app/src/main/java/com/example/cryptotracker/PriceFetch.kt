@@ -2,15 +2,16 @@ package com.example.cryptotracker
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import android.util.Log
 
-
-suspend fun fetchPriceHistoryAtNoon(): List<Pair<String, Double>> =
+suspend fun fetchPriceHistoryAtNoon(coinId: String): List<Pair<String, Double>> =
     withContext(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.coingecko.com/api/v3/")
@@ -18,7 +19,16 @@ suspend fun fetchPriceHistoryAtNoon(): List<Pair<String, Double>> =
             .build()
 
         val service = retrofit.create(MainActivity.CoinGeckoService::class.java)
-        val response = service.getMarketChart()
+
+        val response = try {
+            service.getMarketChart(coinId)
+        } catch (e: HttpException) {
+            Log.e("PriceFetch", "HTTP ${e.code()} - ${e.message()}")
+            return@withContext emptyList()
+        } catch (e: Exception) {
+            Log.e("PriceFetch", "Unexpected error", e)
+            return@withContext emptyList()
+        }
 
         val zone = ZoneId.of("Pacific/Auckland")
         val formatter = DateTimeFormatter.ofPattern("MMM dd")

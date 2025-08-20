@@ -15,25 +15,31 @@ object BottomTabHandler {
         bottomNav: BottomNavigationView,
         priceTextView: TextView,
         balanceTextView: TextView,
-        walletAddresses: Map<String, String>
+        walletAddresses: Map<String, String>,
+        getSelectedCoin: () -> String
     ) {
+        bottomNav.itemIconTintList = null
+
         bottomNav.setOnItemSelectedListener { item ->
+            val coinId = getSelectedCoin()
+
             when (item.itemId) {
                 R.id.tab1 -> {
-                    priceTextView.text = "Loading BTC price..."
+                    priceTextView.text = "Loading ${coinId.uppercase()} price..."
                     balanceTextView.text = ""
 
                     if (context is MainActivity) {
-                        context.loadCoinData("bitcoin")
+                        context.loadCoinData(coinId)
                     }
                     true
                 }
+
                 R.id.tab2 -> {
                     CoroutineScope(Dispatchers.Main).launch {
-                        priceTextView.text = "Loading BTC balance history..."
+                        priceTextView.text = "Loading ${coinId.uppercase()} balance history..."
                         balanceTextView.text = ""
 
-                        val address = walletAddresses["bitcoin"] ?: return@launch
+                        val address = walletAddresses[coinId] ?: return@launch
                         val balanceHistory = fetchHistoricalBalances(address)
 
                         val zone = ZoneId.of("Pacific/Auckland")
@@ -48,23 +54,26 @@ object BottomTabHandler {
                                 .maxByOrNull { entry -> entry.key }
                                 ?.value ?: 0.0
 
-                            "${date.format(formatter)}: ${String.format("%.5f", knownBalance)} BTC"
+                            "${date.format(formatter)}: ${String.format("%.5f", knownBalance)} ${coinId.uppercase()}"
                         }.joinToString("\n")
 
-                        balanceTextView.text = "BTC Balance History:\n$balanceText"
+                        balanceTextView.text = "${coinId.uppercase()} Balance History:\n$balanceText"
                     }
                     true
                 }
+
                 R.id.tab3 -> {
-                    priceTextView.text = "SOL tab tapped (not yet wired)"
+                    priceTextView.text = "${coinId.uppercase()} Tab 3 tapped (not yet wired)"
                     balanceTextView.text = ""
                     true
                 }
+
                 R.id.tab4 -> {
-                    priceTextView.text = "LINK tab tapped (not yet wired)"
+                    priceTextView.text = "${coinId.uppercase()} Tab 4 tapped (not yet wired)"
                     balanceTextView.text = ""
                     true
                 }
+
                 else -> false
             }
         }

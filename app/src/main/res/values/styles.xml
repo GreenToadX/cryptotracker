@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="NoTintBottomNav" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@null</item>
+        <item name="itemTextColor">@null</item> <!-- Optional: disables label tinting too -->
+    </style>
+</resources>

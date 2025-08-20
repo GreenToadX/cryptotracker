@@ -149,6 +149,8 @@
                         android:textSize="12sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
+
+
             </LinearLayout>
 
             <!-- Info Panel (Right-Aligned) -->
@@ -185,16 +187,16 @@
     </LinearLayout>
 
     <!-- Bottom tab bar -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        style="@style/NoTintBottomNav"
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_gravity="bottom"
         android:background="#1E1E1E"
         app:menu="@menu/bottom_nav_menu"
         app:labelVisibilityMode="unlabeled"
-        app:itemIconSize="32dp"
-        app:itemIconTint="@null" />
+        app:itemIconSize="36dp"/>
 </FrameLayout>
 

@@ -1,6 +1,7 @@
 package com.example.cryptotracker
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -17,11 +18,13 @@ import java.time.format.DateTimeFormatter
 
 class MainActivity : AppCompatActivity() {
 
+    var selectedCoin: String = "bitcoin" // ✅ Promoted to class-level
+
     private val walletAddresses = mapOf(
         "bitcoin" to "bc1ql49ydapnjafl5t2cp9zqpjwe6pdgmxy98859v2",
-        "ethereum" to "0xYourEthAddressHere",
-        "solana" to "YourSolanaAddressHere",
-        "chainlink" to "YourChainlinkAddress"
+        "ethereum" to "0x36b6751586614d647d8a3f495e82bdcf250914c8",
+        "solana" to "9dEScN75Ww1JabV8L6oBYY1JLgCE1S81MrBxoaP9k3ic",
+        "chainlink" to "0xf795e4c6ff15afe8b2ed9c2a6c3a6c634c58f65e"
     )
 
     private lateinit var priceTextView: TextView
@@ -44,10 +47,25 @@ class MainActivity : AppCompatActivity() {
         solanaButton = findViewById(R.id.solanaButton)
         chainlinkButton = findViewById(R.id.chainlinkButton)
 
-        bitcoinButton.setOnClickListener { loadCoinData("bitcoin") }
-        ethereumButton.setOnClickListener { loadCoinData("ethereum") }
-        solanaButton.setOnClickListener { loadCoinData("solana") }
-        chainlinkButton.setOnClickListener { loadCoinData("chainlink") }
+        bitcoinButton.setOnClickListener {
+            selectedCoin = "bitcoin"
+            loadCoinData(selectedCoin)
+        }
+
+        ethereumButton.setOnClickListener {
+            selectedCoin = "ethereum"
+            loadCoinData(selectedCoin)
+        }
+
+        solanaButton.setOnClickListener {
+            selectedCoin = "solana"
+            loadCoinData(selectedCoin)
+        }
+
+        chainlinkButton.setOnClickListener {
+            selectedCoin = "chainlink"
+            loadCoinData(selectedCoin)
+        }
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         BottomTabHandler.wireTabs(
@@ -55,9 +73,13 @@ class MainActivity : AppCompatActivity() {
             bottomNav = bottomNav,
             priceTextView = priceTextView,
             balanceTextView = balanceTextView,
-            walletAddresses = walletAddresses
+            walletAddresses = walletAddresses,
+            getSelectedCoin = { selectedCoin } // ✅ Lambda to expose current coin
         )
     }
+
+    // ... rest of your MainActivity code remains unchanged
+
 
     fun loadCoinData(coinId: String) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -75,21 +97,25 @@ class MainActivity : AppCompatActivity() {
             }
 
             val address = walletAddresses[coinId] ?: ""
-            val balance = try {
-                if (coinId == "bitcoin") fetchWalletBalance(address) else "--"
+            val balance: Double = try {
+                when (coinId) {
+                    "bitcoin" -> fetchWalletBalance(address)
+                    "ethereum" -> EthereumFetcher.fetchBalance(address)
+                    "solana" -> SolanaFetcher.fetchBalance(address)
+                    "chainlink" -> ChainlinkFetcher.fetchBalance(address)
+                    else -> 0.0
+                }
             } catch (e: Exception) {
-                "--"
+                Log.e("MainActivity", "Balance fetch failed for $coinId", e)
+                0.0
             }
 
             if (coinId == "bitcoin" && price != "Error" && price != "Rate limit hit") {
                 val priceValue = price.replace(",", "").toDoubleOrNull()
                 priceValue?.let {
                     val fakePurchasePrice = 40000.0
-                    val walletBalance = if (balance is Double) balance else 0.05
-
-                    val profit = (it - fakePurchasePrice) * walletBalance
+                    val profit = (it - fakePurchasePrice) * balance
                     val profitText = "Profit: ${String.format("%,.2f", profit)} NZD"
-
                     priceTextView.text = "BTC Price (NZD): $price\n$profitText"
                 } ?: run {
                     priceTextView.text = "BTC Price (NZD): $price\nProfit: (invalid)"
@@ -100,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                 val last10Days = (1..10).map { today.minusDays(it.toLong()) }
                 val formatter = DateTimeFormatter.ofPattern("MMM dd")
 
-                val history = fetchPriceHistoryAtNoon()
+                val history = fetchPriceHistoryAtNoon(coinId)
                 val historyMap = history.associate { it.first to it.second }
 
                 val historyText = last10Days.map { date ->
@@ -110,12 +136,55 @@ class MainActivity : AppCompatActivity() {
                 }.joinToString("\n")
 
                 balanceTextView.text = "Wallet Balance: $balance BTC\n\nLast 10 Days:\n$historyText"
+            } else if (coinId == "ethereum" && price != "Error" && price != "Rate limit hit") {
+                val priceValue = price.replace(",", "").toDoubleOrNull()
+                priceValue?.let {
+                    val fakePurchasePrice = 3000.0
+                    val profit = (it - fakePurchasePrice) * balance
+                    val profitText = "Profit: ${String.format("%,.2f", profit)} NZD"
+                    priceTextView.text = "ETH Price (NZD): $price\n$profitText"
+                } ?: run {
+                    priceTextView.text = "ETH Price (NZD): $price\nProfit: (invalid)"
+                }
+
+                val zone = ZoneId.of("Pacific/Auckland")
+                val today = LocalDate.now(zone)
+                val last10Days = (1..10).map { today.minusDays(it.toLong()) }
+                val formatter = DateTimeFormatter.ofPattern("MMM dd")
+
+                val history = EthereumFetcher.fetchPriceHistory()
+                val historyMap = history.associate { it.first to it.second }
+
+                val historyText = last10Days.map { date ->
+                    val formattedDate = formatter.format(date)
+                    val price = historyMap[formattedDate] ?: 0.0
+                    "$formattedDate: ${String.format("%,.2f", price)} NZD"
+                }.joinToString("\n")
+
+                balanceTextView.text = "Wallet Balance: $balance ETH\n\nLast 10 Days:\n$historyText"
             } else {
                 priceTextView.text = "${coinId.uppercase()} Price (NZD): $price"
-                balanceTextView.text = when (balance) {
-                    is Double -> "Wallet Balance: $balance ${coinId.uppercase()}"
-                    else -> "Wallet Balance: (not available)"
+
+                val zone = ZoneId.of("Pacific/Auckland")
+                val today = LocalDate.now(zone)
+                val last10Days = (1..10).map { today.minusDays(it.toLong()) }
+                val formatter = DateTimeFormatter.ofPattern("MMM dd")
+
+                val history = when (coinId) {
+                    "solana" -> SolanaFetcher.fetchPriceHistory()
+                    "chainlink" -> ChainlinkFetcher.fetchPriceHistory()
+                    else -> emptyList()
                 }
+
+                val historyMap = history.associate { it.first to it.second }
+
+                val historyText = last10Days.map { date ->
+                    val formattedDate = formatter.format(date)
+                    val price = historyMap[formattedDate] ?: 0.0
+                    "$formattedDate: ${String.format("%,.2f", price)} NZD"
+                }.joinToString("\n")
+
+                balanceTextView.text = "Wallet Balance: $balance ${coinId.uppercase()}\n\nLast 10 Days:\n$historyText"
             }
         }
     }
@@ -127,8 +196,9 @@ class MainActivity : AppCompatActivity() {
             @Query("vs_currencies") vs: String
         ): Map<String, Map<String, Double>>
 
-        @GET("coins/bitcoin/market_chart")
+        @GET("coins/{id}/market_chart")
         suspend fun getMarketChart(
+            @Path("id") coinId: String,
             @Query("vs_currency") vsCurrency: String = "nzd",
             @Query("days") days: Int = 10
         ): MarketChartResponse
@@ -141,6 +211,23 @@ class MainActivity : AppCompatActivity() {
         @GET("address/{address}/txs")
         suspend fun getTransactions(@Path("address") address: String): List<Transaction>
     }
+
+    //  NEW: Ethplorer API interface
+    interface EthplorerService { //
+        @GET("getAddressInfo") //
+        suspend fun getEthplorerInfo( //
+            @Query("apiKey") apiKey: String = "freekey", //
+            @Query("address") address: String //
+        ): EthplorerResponse //
+    } //
+
+    //  NEW: Ethplorer response model
+    data class EthplorerResponse( //
+        val ETH: EthData? //
+    ) //
+
+    data class EthData(val balance: Double) //
+
 
     data class AddressInfoResponse(
         val chain_stats: ChainStats
@@ -190,14 +277,23 @@ class MainActivity : AppCompatActivity() {
         satoshis / 100_000_000.0
     }
 
-    private suspend fun fetchPriceHistoryAtNoon(): List<Pair<String, Double>> = withContext(Dispatchers.IO) {
+    private suspend fun fetchPriceHistoryAtNoon(coinId: String): List<Pair<String, Double>> = withContext(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.coingecko.com/api/v3/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val service = retrofit.create(CoinGeckoService::class.java)
-        val response = service.getMarketChart()
+
+        val response = try {
+            service.getMarketChart(coinId)
+        } catch (e: HttpException) {
+            Log.e("fetchPriceHistoryAtNoon", "HTTP ${e.code()} - ${e.message()}")
+            return@withContext emptyList()
+        } catch (e: Exception) {
+            Log.e("fetchPriceHistoryAtNoon", "Unexpected error", e)
+            return@withContext emptyList()
+        }
 
         val zone = ZoneId.of("Pacific/Auckland")
         val formatter = DateTimeFormatter.ofPattern("MMM dd")
@@ -209,4 +305,4 @@ class MainActivity : AppCompatActivity() {
             formatter.format(date) to price
         }
     }
-}
+    }
