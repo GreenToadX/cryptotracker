@@ -14,9 +14,11 @@ data class EthereumTx(
 )
 
 class EthereumTxAdapter(
-    private val txList: List<EthereumTx>,
+    initialList: List<EthereumTx>,
     private val coinId: String
 ) : RecyclerView.Adapter<EthereumTxAdapter.TxViewHolder>() {
+
+    private val txList: MutableList<EthereumTx> = initialList.toMutableList()
 
     class TxViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val dateText: TextView = view.findViewById(R.id.dateText)
@@ -51,4 +53,10 @@ class EthereumTxAdapter(
     }
 
     override fun getItemCount(): Int = txList.size
+
+    fun updateData(newList: List<EthereumTx>) {
+        txList.clear()
+        txList.addAll(newList)
+        notifyDataSetChanged()
+    }
 }

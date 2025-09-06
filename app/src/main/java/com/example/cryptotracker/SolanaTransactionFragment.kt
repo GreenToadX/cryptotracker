@@ -17,10 +17,12 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import android.util.Log
 
-class SolanaTransactionFragment : Fragment() {
+class SolanaTransactionFragment : Fragment(), FiatToggleable {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: TransactionAdapter
+    private var fullTxList: List<String> = emptyList()
+    private var showingHistorical = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,7 +53,22 @@ class SolanaTransactionFragment : Fragment() {
 
         lifecycleScope.launch {
             val transactions = fetchRecentSolanaTransactions(address)
+            fullTxList = transactions
             adapter.submitList(transactions)
+        }
+    }
+
+    override fun showHistoricalNzd() {
+        if (!showingHistorical) {
+            adapter.submitList(fullTxList.takeLast(5))
+            showingHistorical = true
+        }
+    }
+
+    override fun showCurrentNzd() {
+        if (showingHistorical) {
+            adapter.submitList(fullTxList)
+            showingHistorical = false
         }
     }
 
@@ -94,7 +111,6 @@ class SolanaTransactionFragment : Fragment() {
                 holder.amountText.setTextColor(green)
             }
 
-            // Fade-in animation
             holder.itemView.alpha = 0f
             holder.itemView.animate().alpha(1f).setDuration(300).start()
         }

@@ -12,23 +12,26 @@ import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
-class BitcoinTransactionFragment : Fragment(R.layout.fragment_bitcoin_transaction) {
+class BitcoinTransactionFragment : Fragment(R.layout.fragment_bitcoin_transaction), FiatToggleable {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: BitcoinTxAdapter
+    private var fullTxList: List<BitcoinTx> = emptyList()
+    private var showingHistorical = false
+    private lateinit var address: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerView = view.findViewById(R.id.txRecyclerView)
+        recyclerView = view.findViewById(R.id.btcRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.setHasFixedSize(true)
 
+        address = arguments?.getString("address") ?: return
         fetchTransactions()
     }
 
     private fun fetchTransactions() {
-        val address = arguments?.getString("address") ?: return
         val url = "https://blockchain.info/rawaddr/$address"
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -60,6 +63,7 @@ class BitcoinTransactionFragment : Fragment(R.layout.fragment_bitcoin_transactio
                 }
 
                 withContext(Dispatchers.Main) {
+                    fullTxList = txList
                     adapter = BitcoinTxAdapter(txList)
                     recyclerView.adapter = adapter
                 }
@@ -67,6 +71,20 @@ class BitcoinTransactionFragment : Fragment(R.layout.fragment_bitcoin_transactio
             } catch (e: Exception) {
                 Log.e("BitcoinFragment", "Error fetching BTC transactions", e)
             }
+        }
+    }
+
+    override fun showHistoricalNzd() {
+        if (!showingHistorical) {
+            adapter.updateData(fullTxList.takeLast(10))
+            showingHistorical = true
+        }
+    }
+
+    override fun showCurrentNzd() {
+        if (showingHistorical) {
+            adapter.updateData(fullTxList)
+            showingHistorical = false
         }
     }
 

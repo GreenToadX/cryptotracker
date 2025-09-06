@@ -3,8 +3,6 @@ package com.example.cryptotracker
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -71,7 +69,7 @@ class EthereumTransactionFragment : Fragment(R.layout.fragment_ethereum_transact
 
                 withContext(Dispatchers.Main) {
                     fullTxList = txList
-                    adapter = EthereumTxAdapter(txList, coinId)
+                    adapter = EthereumTxAdapter(txList.toMutableList(), coinId)
                     recyclerView.adapter = adapter
                 }
 
@@ -83,8 +81,7 @@ class EthereumTransactionFragment : Fragment(R.layout.fragment_ethereum_transact
 
     override fun showHistoricalNzd() {
         if (!showingHistorical) {
-            val historicalList = fullTxList.takeLast(10) // or however you define "historical"
-            adapter.updateData(historicalList)
+            adapter.updateData(fullTxList.takeLast(10))
             showingHistorical = true
         }
     }

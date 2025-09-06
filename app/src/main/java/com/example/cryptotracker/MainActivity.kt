@@ -7,6 +7,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -68,10 +70,21 @@ class MainActivity : AppCompatActivity() {
             selectedCoinProvider = { selectedCoin }
         )
 
-        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
-        if (fragment is FiatToggleable) {
-            Tab3Controller(findViewById(R.id.fragmentContainer), fragment).wireToggleButtons()
-        }
+        supportFragmentManager.registerFragmentLifecycleCallbacks(
+            object : FragmentManager.FragmentLifecycleCallbacks() {
+                override fun onFragmentViewCreated(
+                    fm: FragmentManager,
+                    f: Fragment,
+                    v: View,
+                    savedInstanceState: Bundle?
+                ) {
+                    if (f is FiatToggleable) {
+                        Tab3Controller(v, f).wireToggleButtons()
+                    }
+                }
+            },
+            true
+        )
     }
 
     private fun refreshAndLoad() {

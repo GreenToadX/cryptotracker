@@ -14,8 +14,10 @@ data class BitcoinTx(
 )
 
 class BitcoinTxAdapter(
-    private val txList: List<BitcoinTx>
+    initialList: List<BitcoinTx>
 ) : RecyclerView.Adapter<BitcoinTxAdapter.TxViewHolder>() {
+
+    private val txList: MutableList<BitcoinTx> = initialList.toMutableList()
 
     class TxViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val dateText: TextView = view.findViewById(R.id.dateText)
@@ -44,4 +46,10 @@ class BitcoinTxAdapter(
     }
 
     override fun getItemCount(): Int = txList.size
+
+    fun updateData(newList: List<BitcoinTx>) {
+        txList.clear()
+        txList.addAll(newList)
+        notifyDataSetChanged()
+    }
 }
