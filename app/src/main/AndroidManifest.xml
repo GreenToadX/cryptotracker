@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.cryptotracker">
 
+    <!-- Internet permission – required for your network calls -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -16,24 +17,30 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CryptoTracker">
 
-        <!-- New launcher activity -->
+        <!-- Launcher activity -->
         <activity
             android:name=".LandingActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.CryptoTracker">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Your existing crypto dashboard -->
+        <!-- Your main dashboard activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:theme="@style/Theme.CryptoTracker" />
+
+        <!-- Settings activity (added to fix crash) -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_title"
             android:theme="@style/Theme.CryptoTracker" />
 
     </application>

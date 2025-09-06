@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:background="#1E1E1E"
+    android:layout_marginBottom="12dp"
+    android:clipToPadding="false">
+
+    <!-- Coin Icon -->
+    <ImageView
+        android:id="@+id/coinIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:contentDescription="Coin Icon"
+        android:scaleType="centerInside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/coinLabel"
+        android:tint="#FFFFFF" />
+
+    <!-- Coin Label -->
+    <TextView
+        android:id="@+id/coinLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BTC"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/coinIcon"
+        app:layout_constraintTop_toTopOf="@id/coinIcon"
+        android:layout_marginStart="8dp" />
+
+    <!-- Wallet Input -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/walletInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:boxBackgroundMode="outline"
+        app:boxCornerRadiusTopStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusBottomEnd="8dp"
+        app:boxStrokeColor="#FFFFFF"
+        app:boxStrokeWidth="2dp"
+        app:boxStrokeWidthFocused="2dp"
+        app:boxBackgroundColor="#2A2A2A"
+        app:hintTextColor="@android:color/white"
+        app:helperTextTextColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/coinLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/addressField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAAAAA"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

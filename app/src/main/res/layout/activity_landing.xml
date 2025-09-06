@@ -23,4 +23,13 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#6200EE"
         android:layout_marginTop="32dp" />
+
+    <Button
+        android:id="@+id/settingsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#03DAC5"
+        android:layout_marginTop="16dp" />
 </LinearLayout>

@@ -2,7 +2,6 @@ package com.example.cryptotracker
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -10,9 +9,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 interface CoinDataFetcher {
     suspend fun fetchBalance(address: String): Double
@@ -44,8 +40,6 @@ object EthereumFetcher : CoinDataFetcher {
             val service = retrofit.create(EtherscanService::class.java)
             val response = service.getBalance(address = address)
 
-            println("Raw wei from Etherscan: ${response.result}")
-
             val wei = response.result.toBigDecimalOrNull() ?: return@withContext 0.0
             val eth = wei.divide(BigDecimal("1000000000000000000"))
             String.format("%.4f", eth).toDouble()
@@ -55,33 +49,8 @@ object EthereumFetcher : CoinDataFetcher {
         }
     }
 
-    override suspend fun fetchPriceHistory(): List<Pair<String, Double>> = withContext(Dispatchers.IO) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.coingecko.com/api/v3/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service = retrofit.create(MainActivity.CoinGeckoService::class.java)
-
-        val response = try {
-            service.getMarketChart("ethereum")
-        } catch (e: HttpException) {
-            println("EthereumFetcher HTTP ${e.code()} - ${e.message()}")
-            return@withContext emptyList()
-        } catch (e: Exception) {
-            println("EthereumFetcher unexpected error: ${e.localizedMessage}")
-            return@withContext emptyList()
-        }
-
-        val zone = ZoneId.of("Pacific/Auckland")
-        val formatter = DateTimeFormatter.ofPattern("MMM dd")
-
-        response.prices.mapNotNull { entry ->
-            val timestamp = entry[0].toLong()
-            val price = entry[1]
-            val date = Instant.ofEpochMilli(timestamp).atZone(zone).toLocalDate()
-            formatter.format(date) to price
-        }
+    override suspend fun fetchPriceHistory(): List<Pair<String, Double>> {
+        return CoinGeckoThrottledFetcher.fetch("ethereum")
     }
 }
 
@@ -118,33 +87,8 @@ object SolanaFetcher : CoinDataFetcher {
         }
     }
 
-    override suspend fun fetchPriceHistory(): List<Pair<String, Double>> = withContext(Dispatchers.IO) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.coingecko.com/api/v3/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service = retrofit.create(MainActivity.CoinGeckoService::class.java)
-
-        val response = try {
-            service.getMarketChart("solana")
-        } catch (e: HttpException) {
-            println("SolanaFetcher HTTP ${e.code()} - ${e.message()}")
-            return@withContext emptyList()
-        } catch (e: Exception) {
-            println("SolanaFetcher unexpected error: ${e.localizedMessage}")
-            return@withContext emptyList()
-        }
-
-        val zone = ZoneId.of("Pacific/Auckland")
-        val formatter = DateTimeFormatter.ofPattern("MMM dd")
-
-        response.prices.mapNotNull { entry ->
-            val timestamp = entry[0].toLong()
-            val price = entry[1]
-            val date = Instant.ofEpochMilli(timestamp).atZone(zone).toLocalDate()
-            formatter.format(date) to price
-        }
+    override suspend fun fetchPriceHistory(): List<Pair<String, Double>> {
+        return CoinGeckoThrottledFetcher.fetch("solana")
     }
 }
 
@@ -182,32 +126,7 @@ object ChainlinkFetcher : CoinDataFetcher {
         }
     }
 
-    override suspend fun fetchPriceHistory(): List<Pair<String, Double>> = withContext(Dispatchers.IO) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.coingecko.com/api/v3/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service = retrofit.create(MainActivity.CoinGeckoService::class.java)
-
-        val response = try {
-            service.getMarketChart("chainlink")
-        } catch (e: HttpException) {
-            println("ChainlinkFetcher HTTP ${e.code()} - ${e.message()}")
-            return@withContext emptyList()
-        } catch (e: Exception) {
-            println("ChainlinkFetcher unexpected error: ${e.localizedMessage}")
-            return@withContext emptyList()
-        }
-
-        val zone = ZoneId.of("Pacific/Auckland")
-        val formatter = DateTimeFormatter.ofPattern("MMM dd")
-
-        response.prices.mapNotNull { entry ->
-            val timestamp = entry[0].toLong()
-            val price = entry[1]
-            val date = Instant.ofEpochMilli(timestamp).atZone(zone).toLocalDate()
-            formatter.format(date) to price
-        }
+    override suspend fun fetchPriceHistory(): List<Pair<String, Double>> {
+        return CoinGeckoThrottledFetcher.fetch("chainlink")
     }
 }
