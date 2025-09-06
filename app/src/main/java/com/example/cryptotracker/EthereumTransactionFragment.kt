@@ -3,6 +3,8 @@ package com.example.cryptotracker
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
+import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,10 +16,14 @@ import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
-class EthereumTransactionFragment : Fragment(R.layout.fragment_ethereum_transaction) {
+class EthereumTransactionFragment : Fragment(R.layout.fragment_ethereum_transaction), FiatToggleable {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: EthereumTxAdapter
+    private var fullTxList: List<EthereumTx> = emptyList()
+    private var showingHistorical = false
+    private lateinit var coinId: String
+    private lateinit var address: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -26,12 +32,13 @@ class EthereumTransactionFragment : Fragment(R.layout.fragment_ethereum_transact
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.setHasFixedSize(true)
 
+        address = arguments?.getString("address") ?: return
+        coinId = arguments?.getString("coin") ?: "ethereum"
+
         fetchTransactions()
     }
 
     private fun fetchTransactions() {
-        val address = arguments?.getString("address") ?: return
-        val coinId = arguments?.getString("coin") ?: "ethereum"
         val url = "https://api.etherscan.io/api?module=account&action=txlist&address=$address&sort=desc&apikey=D3HM6P7NH8NMBINBJ7CP1ENXHMHS554ICX"
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -63,6 +70,7 @@ class EthereumTransactionFragment : Fragment(R.layout.fragment_ethereum_transact
                 }
 
                 withContext(Dispatchers.Main) {
+                    fullTxList = txList
                     adapter = EthereumTxAdapter(txList, coinId)
                     recyclerView.adapter = adapter
                 }
@@ -70,6 +78,21 @@ class EthereumTransactionFragment : Fragment(R.layout.fragment_ethereum_transact
             } catch (e: Exception) {
                 Log.e("EthereumFragment", "Error fetching transactions", e)
             }
+        }
+    }
+
+    override fun showHistoricalNzd() {
+        if (!showingHistorical) {
+            val historicalList = fullTxList.takeLast(10) // or however you define "historical"
+            adapter.updateData(historicalList)
+            showingHistorical = true
+        }
+    }
+
+    override fun showCurrentNzd() {
+        if (showingHistorical) {
+            adapter.updateData(fullTxList)
+            showingHistorical = false
         }
     }
 

@@ -38,6 +38,33 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="16dp" />
 
+        <!-- Fiat Toggle Buttons -->
+        <LinearLayout
+            android:id="@+id/nzdToggleContainer"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="12dp">
+
+            <ImageButton
+                android:id="@+id/btnHistoricalNzd"
+                android:src="@drawable/ic_arrow_toggle"
+                android:contentDescription="Show historical NZD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnCurrentNzd"
+                android:text="Current NZD"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp" />
+        </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

@@ -67,6 +67,11 @@ class MainActivity : AppCompatActivity() {
             walletAddresses = walletAddresses,
             selectedCoinProvider = { selectedCoin }
         )
+
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+        if (fragment is FiatToggleable) {
+            Tab3Controller(findViewById(R.id.fragmentContainer), fragment).wireToggleButtons()
+        }
     }
 
     private fun refreshAndLoad() {
